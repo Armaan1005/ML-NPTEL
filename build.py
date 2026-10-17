@@ -17,7 +17,7 @@ for si, s in enumerate(data):
     for qi, q in enumerate(s['qs']):
         q['h'], q['e'] = hints[f'{si}-{qi}']
 
-blob = json.dumps(data, ensure_ascii=False, separators=(',', ':')).replace('</', '<\/')
+blob = json.dumps(data, ensure_ascii=False, separators=(',', ':')).replace('</', '<' + chr(92) + '/')
 page = open(p('data', 'template.html'), encoding='utf-8').read().replace('/*__DATA__*/null', blob)
 open(p('index.html'), 'w', encoding='utf-8').write(page)
 print('Built index.html')
