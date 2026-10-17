@@ -1,0 +1,586 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>ML Revision</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@600;700;800&family=Figtree:ital,wght@0,400;0,500;0,600;0,700;1,400&display=swap">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.9/katex.min.css">
+<style>
+/* Layout: iOS-style app shell. Home = summary widget, 2x2 control tiles, week cards grid. Quiz = translucent nav, tappable progress strip, option cards, floating action bar. */
+:root{
+  --bg:#F2F2F7; --card:#FFFFFF; --raised:#FFFFFF; --label:#0B0B0F; --label2:#6B6B76; --label3:#AEAEB6;
+  --sep:rgba(60,60,67,.14); --fill:rgba(118,118,128,.10); --fill2:rgba(118,118,128,.18);
+  --blue:#0A7AFF; --green:#28B455; --red:#F2382C; --orange:#FF8A00; --indigo:#5856D6; --teal:#1EA5C4; --pink:#F2316B;
+  --green-bg:rgba(40,180,85,.11); --red-bg:rgba(242,56,44,.09); --blue-bg:rgba(10,122,255,.09);
+  --bar:rgba(246,246,250,.78);
+  --shadow:0 1px 2px rgba(15,15,30,.04), 0 6px 20px rgba(15,15,30,.05);
+  --shadow-hi:0 2px 4px rgba(15,15,30,.06), 0 12px 32px rgba(15,15,30,.10);
+  --display:"Plus Jakarta Sans", -apple-system, "Segoe UI", Roboto, sans-serif;
+  --text:"Figtree", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  --mono:ui-monospace, "SF Mono", "Cascadia Mono", Consolas, monospace;
+  color-scheme: light;
+}
+@media (prefers-color-scheme: dark){ :root:not([data-theme="light"]){
+  --bg:#1B1D24; --card:#262933; --raised:#2F3340; --label:#F3F4F8; --label2:#A6A9B6; --label3:#6E7280;
+  --sep:rgba(255,255,255,.10); --fill:rgba(150,155,175,.16); --fill2:rgba(150,155,175,.26);
+  --blue:#2D8CFF; --green:#34D364; --red:#FF5147; --orange:#FF9F0A; --indigo:#7A78FF; --teal:#3CC6E3; --pink:#FF4F83;
+  --green-bg:rgba(52,211,100,.14); --red-bg:rgba(255,81,71,.14); --blue-bg:rgba(45,140,255,.16);
+  --bar:rgba(30,32,40,.80);
+  --shadow:0 0 0 1px rgba(255,255,255,.05), 0 4px 14px rgba(0,0,0,.18); --shadow-hi:0 0 0 1px rgba(255,255,255,.08), 0 12px 32px rgba(0,0,0,.35);
+  color-scheme: dark;
+}}
+:root[data-theme="dark"]{
+  --bg:#1B1D24; --card:#262933; --raised:#2F3340; --label:#F3F4F8; --label2:#A6A9B6; --label3:#6E7280;
+  --sep:rgba(255,255,255,.10); --fill:rgba(150,155,175,.16); --fill2:rgba(150,155,175,.26);
+  --blue:#2D8CFF; --green:#34D364; --red:#FF5147; --orange:#FF9F0A; --indigo:#7A78FF; --teal:#3CC6E3; --pink:#FF4F83;
+  --green-bg:rgba(52,211,100,.14); --red-bg:rgba(255,81,71,.14); --blue-bg:rgba(45,140,255,.16);
+  --bar:rgba(30,32,40,.80);
+  --shadow:0 0 0 1px rgba(255,255,255,.05), 0 4px 14px rgba(0,0,0,.18); --shadow-hi:0 0 0 1px rgba(255,255,255,.08), 0 12px 32px rgba(0,0,0,.35);
+  color-scheme: dark;
+}
+*{box-sizing:border-box}
+html,body{margin:0}
+body{background:var(--bg); color:var(--label); font-family:var(--text); font-size:16px; line-height:1.45; -webkit-font-smoothing:antialiased; -moz-osx-font-smoothing:grayscale; -webkit-tap-highlight-color:transparent}
+button{font:inherit; color:inherit; background:none; border:0; padding:0; cursor:pointer; text-align:inherit}
+button:focus-visible, label:focus-within{outline:3px solid color-mix(in srgb, var(--blue) 50%, transparent); outline-offset:2px}
+[hidden]{display:none!important}
+#app{min-height:100vh; min-height:100dvh; display:flex; flex-direction:column}
+.wrap{flex:1; width:100%; max-width:760px; margin:0 auto; padding-inline:16px; padding-block:0 48px}
+.num{font-variant-numeric:tabular-nums}
+.fade{animation:fade .28s cubic-bezier(.2,.7,.3,1)}
+@keyframes fade{from{opacity:0; transform:translateY(8px)} to{opacity:1; transform:none}}
+@media (prefers-reduced-motion: reduce){ *{transition:none!important; animation:none!important} }
+
+/* ---------- home ---------- */
+.hero{padding-block:28px 4px; display:flex; align-items:flex-end; justify-content:space-between; gap:12px}
+.eyebrow{font-size:12.5px; font-weight:600; letter-spacing:.08em; text-transform:uppercase; color:var(--label2)}
+h1{font-family:var(--display); font-weight:800; font-size:clamp(32px, 7vw, 40px); line-height:1.05; letter-spacing:-.025em; margin:6px 0 0; text-wrap:balance}
+.course-tag{font-size:12.5px; font-weight:600; color:var(--label2); background:var(--card); box-shadow:var(--shadow); padding:6px 10px; border-radius:999px; white-space:nowrap}
+
+.summary{margin-top:20px; background:var(--card); border-radius:22px; box-shadow:var(--shadow); padding:18px; display:flex; gap:18px; align-items:center}
+.summary .big-ring{width:92px; height:92px; flex:none}
+.summary-main{flex:1; min-width:0}
+.summary-title{font-family:var(--display); font-weight:700; font-size:20px; letter-spacing:-.01em}
+.summary-sub{color:var(--label2); font-size:14px; margin-top:2px}
+.metrics{display:flex; gap:8px; margin-top:12px; flex-wrap:wrap}
+.metric{background:var(--fill); border-radius:12px; padding:7px 11px; min-width:84px}
+.metric b{display:block; font-family:var(--display); font-weight:700; font-size:18px; line-height:1.15}
+.metric span{font-size:12px; color:var(--label2)}
+
+.tiles{display:grid; grid-template-columns:repeat(4,1fr); gap:10px; margin-top:12px}
+.tile{background:var(--card); border-radius:18px; box-shadow:var(--shadow); padding:14px; display:flex; flex-direction:column; gap:10px; min-height:112px; transition:transform .12s, box-shadow .2s; position:relative}
+.tile:active{transform:scale(.97)}
+.tile[disabled]{cursor:default; opacity:.55}
+.tile[disabled]:active{transform:none}
+.tile .ic{width:34px; height:34px; border-radius:50%; display:grid; place-items:center; color:#fff}
+.tile .ic svg{width:18px; height:18px}
+.tile b{font-family:var(--display); font-weight:700; font-size:15.5px; letter-spacing:-.005em; line-height:1.2}
+.tile small{display:block; font-size:12.5px; color:var(--label2); margin-top:2px; line-height:1.3}
+.tile .corner{position:absolute; top:14px; right:14px; font-family:var(--display); font-weight:700; font-size:15px}
+.switch{position:absolute; top:14px; right:14px; width:44px; height:27px}
+.switch i{position:absolute; inset:0; background:var(--fill2); border-radius:999px; transition:background .2s}
+.switch i::after{content:""; position:absolute; top:2px; left:2px; width:23px; height:23px; border-radius:50%; background:#fff; box-shadow:0 2px 6px rgba(0,0,0,.18); transition:transform .22s cubic-bezier(.3,.7,.4,1)}
+.tile.on .switch i{background:var(--green)}
+.tile.on .switch i::after{transform:translateX(17px)}
+
+.sec-h{display:flex; align-items:baseline; justify-content:space-between; gap:10px; padding:30px 4px 10px}
+.sec-h h2{font-family:var(--display); font-weight:800; font-size:22px; letter-spacing:-.02em; margin:0}
+.sec-h span{font-size:13px; color:var(--label2)}
+
+.weeks{display:grid; grid-template-columns:repeat(2, minmax(0,1fr)); gap:12px}
+.wk{background:var(--card); border-radius:20px; box-shadow:var(--shadow); padding:16px; display:flex; flex-direction:column; gap:12px; min-width:0}
+.wk-top{display:flex; gap:12px; align-items:center}
+.wk-num{width:42px; height:42px; border-radius:13px; flex:none; display:grid; place-items:center; font-family:var(--display); font-weight:800; font-size:18px; color:var(--c); background:color-mix(in srgb, var(--c) 14%, transparent)}
+.wk-label{font-size:11.5px; font-weight:700; letter-spacing:.08em; text-transform:uppercase; color:var(--c)}
+.wk h3{font-family:var(--display); font-weight:700; font-size:17px; letter-spacing:-.01em; line-height:1.2; margin:1px 0 0; text-wrap:balance}
+.wk-sub{font-size:13.5px; color:var(--label2); margin:0; display:-webkit-box; -webkit-line-clamp:2; -webkit-box-orient:vertical; overflow:hidden; line-height:1.4; min-height:2.8em}
+.wk-bar{height:6px; border-radius:3px; background:var(--fill); overflow:hidden}
+.wk-bar i{display:block; height:100%; border-radius:3px; transition:width .4s}
+.wk-actions{display:flex; flex-wrap:wrap; gap:8px}
+.chip{flex:1 0 auto; display:flex; align-items:center; justify-content:space-between; gap:8px; height:42px; padding:0 7px 0 14px; border-radius:13px; font-family:var(--display); font-size:14px; font-weight:700; letter-spacing:-.005em; background:var(--fill2); color:var(--label); transition:transform .1s, filter .15s; white-space:nowrap}
+.chip:hover{filter:brightness(1.08)}
+.chip:active{transform:scale(.97)}
+.chip.primary{background:var(--c); color:#fff; box-shadow:0 4px 12px color-mix(in srgb, var(--c) 28%, transparent)}
+.chip .meta{flex:none; font-family:var(--text); font-weight:700; font-size:12px; line-height:1; padding:6px 8px; border-radius:8px; background:var(--fill); color:var(--label2)}
+.chip.primary .meta{background:rgba(255,255,255,.22); color:#fff}
+.chip .meta.good{background:var(--green); color:#fff} .chip .meta.mid{background:var(--orange); color:#fff} .chip .meta.bad{background:var(--red); color:#fff}
+.chip.primary .meta.good, .chip.primary .meta.mid, .chip.primary .meta.bad{background:#fff}
+.chip.primary .meta.good{color:var(--green)} .chip.primary .meta.mid{color:var(--orange)} .chip.primary .meta.bad{color:var(--red)}
+.chip-solo{flex:1}
+
+.foot{display:flex; justify-content:space-between; align-items:center; gap:12px; flex-wrap:wrap; margin-top:28px; padding:0 4px; font-size:13px; color:var(--label2)}
+.foot button{color:var(--red); font-weight:600; font-size:14px; padding:8px 0}
+
+/* ---------- quiz ---------- */
+.nav{position:sticky; top:0; z-index:20; background:var(--bar); backdrop-filter:saturate(180%) blur(22px); -webkit-backdrop-filter:saturate(180%) blur(22px); border-bottom:.5px solid var(--sep); padding-top:env(safe-area-inset-top,0px)}
+.nav-in{max-width:760px; margin:0 auto; min-height:54px; padding-inline:8px; display:grid; grid-template-columns:minmax(80px,1fr) auto minmax(80px,1fr); align-items:center}
+.nav-title{text-align:center; min-width:0; overflow:hidden}
+.nav-title b{display:block; font-family:var(--display); font-weight:700; font-size:16px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis}
+.nav-title small{display:block; font-size:12px; color:var(--label2); white-space:nowrap; overflow:hidden; text-overflow:ellipsis; max-width:50vw; margin-inline:auto}
+.nav-btn{color:var(--blue); font-size:16px; font-weight:500; display:inline-flex; align-items:center; gap:3px; padding:8px; border-radius:10px}
+.nav-btn:active{opacity:.4}
+.nav-btn svg{width:11px; height:19px}
+.nav-right{justify-self:end}
+
+.strip{display:flex; flex-wrap:wrap; gap:4px; margin-top:16px}
+.strip button{flex:1 0 14px; max-width:44px; height:6px; border-radius:3px; background:var(--fill2); transition:background .2s, transform .15s}
+.strip button:hover{transform:scaleY(1.6)}
+.strip button.ok{background:var(--green)} .strip button.no{background:var(--red)} .strip button.seen{background:var(--label3)}
+.strip button.cur{background:var(--blue); transform:scaleY(1.6)}
+.linebar{height:6px; border-radius:3px; background:var(--fill2); overflow:hidden; margin-top:16px; display:flex}
+.linebar i{display:block; height:100%}
+
+.qhead{display:flex; flex-wrap:wrap; align-items:center; gap:8px; margin-top:18px}
+.qno{font-family:var(--display); font-weight:800; font-size:13px; letter-spacing:.06em; text-transform:uppercase; color:var(--blue)}
+.qno span{color:var(--label3)}
+.pill{display:inline-flex; align-items:center; gap:5px; font-size:12px; font-weight:600; padding:4px 10px; border-radius:999px; background:var(--card); box-shadow:var(--shadow); color:var(--label2)}
+.pill.multi{background:var(--blue-bg); color:var(--blue); box-shadow:none}
+.pill svg{width:12px; height:12px}
+
+.qcard{background:var(--card); border-radius:22px; box-shadow:var(--shadow); padding:20px; margin-top:10px; font-size:18px; line-height:1.55; font-weight:500; letter-spacing:-.003em; overflow-wrap:anywhere}
+.qcard img, .opt img{display:block; max-width:100%; height:auto; background:#fff; border-radius:10px; margin:12px 0; padding:6px; box-shadow:0 0 0 1px var(--sep)}
+.qcard a{color:var(--blue)}
+.katex{font-size:1.04em}
+.katex-display{margin:.5em 0; overflow-x:auto; overflow-y:hidden; padding-block:2px}
+
+.opts{display:flex; flex-direction:column; gap:10px; margin-top:14px}
+.opt{display:flex; align-items:flex-start; gap:13px; width:100%; background:var(--card); border-radius:18px; box-shadow:var(--shadow); padding:15px 16px; border:2px solid transparent; transition:background .15s, border-color .15s, transform .12s, box-shadow .2s; font-size:16px; line-height:1.5}
+.opt:not([disabled]):hover{box-shadow:var(--shadow-hi)}
+.opt:not([disabled]):active{transform:scale(.985)}
+.opt[disabled]{cursor:default}
+.opt .key{flex:none; width:30px; height:30px; border-radius:50%; display:grid; place-items:center; background:var(--fill); color:var(--label2); font-family:var(--display); font-size:14px; font-weight:700; transition:background .15s,color .15s; margin-top:-2px}
+.opt.multi .key{border-radius:9px}
+.opt .body{flex:1; min-width:0; overflow-wrap:anywhere; overflow-x:auto}
+.opt .mark{flex:none; width:22px; height:22px; margin-top:1px}
+.opt.sel{border-color:var(--blue); background:var(--blue-bg); box-shadow:none}
+.opt.sel .key{background:var(--blue); color:#fff}
+.opt.right{border-color:var(--green); background:var(--green-bg); box-shadow:none}
+.opt.right .key{background:var(--green); color:#fff}
+.opt.wrong{border-color:var(--red); background:var(--red-bg); box-shadow:none}
+.opt.wrong .key{background:var(--red); color:#fff}
+.opt.missed{border-color:var(--green); border-style:dashed; box-shadow:none}
+.opt.missed .key{background:var(--green); color:#fff}
+.opt.dim{opacity:.6}
+
+.feedback{margin-top:14px; border-radius:18px; padding:14px 16px; font-size:15px; display:flex; gap:12px; align-items:center; animation:pop .3s cubic-bezier(.2,.9,.3,1.2)}
+@keyframes pop{from{opacity:0; transform:translateY(6px) scale(.98)} to{opacity:1; transform:none}}
+.feedback .fi{flex:none; width:34px; height:34px; border-radius:50%; display:grid; place-items:center; color:#fff}
+.feedback .fi svg{width:18px; height:18px}
+.feedback b{display:block; font-family:var(--display); font-weight:700; font-size:16px}
+.feedback span{color:var(--label2); font-size:14px}
+.feedback.ok{background:var(--green-bg)} .feedback.ok .fi{background:var(--green)} .feedback.ok b{color:var(--green)}
+.feedback.no{background:var(--red-bg)} .feedback.no .fi{background:var(--red)} .feedback.no b{color:var(--red)}
+.feedback.key{background:var(--blue-bg)} .feedback.key .fi{background:var(--blue)} .feedback.key b{color:var(--blue)}
+.reveal{display:inline-flex; align-items:center; gap:6px; color:var(--blue); font-size:15px; font-weight:600; padding:12px 4px 0}
+.reveal:active{opacity:.4}
+.reveal svg{width:16px; height:16px}
+.tools{display:flex; gap:20px; flex-wrap:wrap}
+.explain, .hintbox{margin-top:12px; border-radius:18px; padding:14px 16px; background:var(--card); box-shadow:var(--shadow); font-size:15.5px; line-height:1.55}
+.hintbox{background:color-mix(in srgb, var(--orange) 10%, var(--card)); box-shadow:none}
+.ex-h{display:flex; align-items:center; gap:7px; font-family:var(--display); font-weight:700; font-size:13px; letter-spacing:.04em; text-transform:uppercase; color:var(--orange); margin-bottom:6px}
+.ex-h svg{width:17px; height:17px}
+.ex-b{overflow-wrap:anywhere; overflow-x:auto}
+.ex-hint{margin-top:10px; padding-top:10px; border-top:.5px solid var(--sep); font-size:14px; color:var(--label2); overflow-wrap:anywhere}
+.ex-hint b{color:var(--label); font-weight:600; margin-right:4px}
+.hint{font-size:12.5px; color:var(--label2); text-align:center; margin-top:22px}
+.kbd{font-family:var(--mono); font-size:11.5px; padding:1px 6px; border-radius:6px; background:var(--card); box-shadow:var(--shadow); color:var(--label2)}
+
+.actionbar{position:sticky; bottom:0; z-index:15; padding:10px 16px calc(12px + env(safe-area-inset-bottom,0px)); pointer-events:none}
+.actionbar-in{pointer-events:auto; max-width:728px; margin:0 auto; display:flex; gap:8px; padding:8px; border-radius:24px; background:var(--bar); backdrop-filter:saturate(180%) blur(22px); -webkit-backdrop-filter:saturate(180%) blur(22px); box-shadow:var(--shadow-hi)}
+.btn{height:50px; border-radius:17px; font-family:var(--display); font-size:16.5px; font-weight:700; letter-spacing:-.005em; padding:0 18px; display:inline-flex; align-items:center; justify-content:center; gap:8px; transition:opacity .15s, transform .1s, background .2s}
+.btn:active{transform:scale(.97)}
+.btn.primary{background:var(--blue); color:#fff; flex:1}
+.btn.primary.go-green{background:var(--green)}
+.btn.primary[disabled]{background:var(--fill2); color:var(--label3); cursor:default; transform:none}
+.btn.icon{width:50px; padding:0; background:var(--fill); color:var(--label)}
+.btn.icon[disabled]{color:var(--label3); cursor:default; transform:none}
+.btn.secondary{background:var(--card); color:var(--blue); box-shadow:var(--shadow); width:100%}
+.btn svg{width:18px; height:18px}
+
+/* ---------- results ---------- */
+.result{background:var(--card); border-radius:26px; box-shadow:var(--shadow); padding:28px 20px 24px; margin-top:22px; text-align:center}
+.result svg{width:150px; height:150px}
+.result h2{font-family:var(--display); font-weight:800; font-size:28px; letter-spacing:-.02em; margin:14px 0 4px}
+.result p{margin:0; color:var(--label2); font-size:15px}
+.result .tally{display:flex; justify-content:center; gap:8px; margin-top:16px; flex-wrap:wrap}
+.result .tally span{font-size:13px; font-weight:600; padding:6px 12px; border-radius:999px}
+.stack{display:flex; flex-direction:column; gap:10px; margin-top:14px}
+.miss{display:flex; gap:12px; align-items:center; width:100%; background:var(--card); box-shadow:var(--shadow); border-radius:16px; padding:12px 14px; margin-top:8px}
+.miss:active{transform:scale(.99)}
+.miss .wk-num{width:34px; height:34px; border-radius:10px; font-size:14px}
+.miss .t{flex:1; min-width:0}
+.miss .t b{display:block; font-size:13px; font-weight:700; color:var(--label2)}
+.miss .t span{display:block; font-size:14.5px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis}
+.chev-r{width:8px; height:13px; color:var(--label3); flex:none}
+
+@media (max-width:640px){
+  .tiles{grid-template-columns:repeat(2,1fr)}
+  .weeks{grid-template-columns:1fr}
+  .hint{display:none}
+  .course-tag{display:none}
+  .summary{padding:16px; gap:14px}
+  .summary .big-ring{width:78px; height:78px}
+  .qcard{font-size:17px; padding:18px}
+}
+
+/* ---------- desktop: spread horizontally ---------- */
+@media (min-width:1000px){
+  .wrap, .nav-in{max-width:1240px}
+  .wrap{padding-inline:32px}
+  .actionbar-in{max-width:1176px}
+  .home{display:grid; grid-template-columns:minmax(0,1fr) minmax(0,1.15fr); column-gap:16px; align-content:start}
+  .home > .hero, .home > .sec-h, .home > .weeks, .home > .foot{grid-column:1 / -1}
+  .home > .summary{margin-top:20px; height:auto}
+  .home > .tiles{margin-top:20px; grid-template-columns:repeat(4,1fr)}
+  .home .tile{min-height:0}
+  .quiz{display:grid; grid-template-columns:minmax(0,1.05fr) minmax(0,1fr); column-gap:28px; align-content:start}
+  .quiz > .strip, .quiz > .linebar, .quiz > .qhead, .quiz > .hint{grid-column:1 / -1}
+  .quiz > .qcard{grid-column:1; align-self:start; position:sticky; top:76px; max-height:calc(100vh - 190px); overflow:auto; margin-top:14px}
+  .quiz > .side{grid-column:2; min-width:0}
+  .quiz .opts{margin-top:14px}
+}
+@media (min-width:1200px){ .weeks{grid-template-columns:repeat(3, minmax(0,1fr))} }
+</style>
+</head>
+<body>
+<div id="app"></div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.9/katex.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.9/contrib/auto-render.min.js"></script>
+<script>
+const DATA = /*__DATA__*/null;
+
+const TOPICS = {
+  0:  ['Maths Refresher', 'Probability basics · Linear algebra · Optimization'],
+  1:  ['Foundations of ML', 'Supervised, unsupervised & RL · Statistical decision theory · Bias–variance'],
+  2:  ['Linear Regression', 'Multivariate regression · Subset selection · Shrinkage · PCR · PLS'],
+  3:  ['Linear Classification', 'Logistic regression · Linear discriminant analysis'],
+  4:  ['Perceptron & SVMs', 'Separating hyperplanes · SVM formulation · Kernels · Hinge loss'],
+  5:  ['Neural Nets & Estimation', 'Backpropagation · Initialization · MLE · Priors and MAP'],
+  6:  ['Decision Trees', 'Regression trees · Pruning · Loss functions · Missing values'],
+  7:  ['Evaluation & Ensembles', 'Cross-validation · ROC · Bagging · Stacking · Boosting'],
+  8:  ['Boosting & Bayes', 'Gradient boosting · Random forests · Naive Bayes · Bayesian networks'],
+  9:  ['Graphical Models', 'Markov networks · HMMs · Variable elimination · Belief propagation'],
+  10: ['Clustering', 'k-means · Hierarchical · BIRCH · CURE · DBSCAN'],
+  11: ['Mixture Models & EM', 'Gaussian mixture models · Expectation maximization'],
+  12: ['Learning Theory & RL', 'Learning theory · Reinforcement learning · TD learning'],
+};
+const WCOL = ['var(--teal)','var(--blue)','var(--indigo)','var(--pink)','var(--orange)','var(--green)','var(--teal)','var(--blue)','var(--indigo)','var(--pink)','var(--orange)','var(--green)','var(--red)'];
+
+const SETS = DATA.map((s, i) => ({ ...s, i, qs: s.qs.map((q, j) => ({ ...q, id: i + '-' + j, set: i, n: j + 1 })) }));
+const ALLQ = SETS.flatMap(s => s.qs);
+const BYID = Object.fromEntries(ALLQ.map(q => [q.id, q]));
+const GRADED = SETS.filter(s => !s.practice);
+const WEEKS = [...new Set(SETS.map(s => s.w))].sort((a, b) => a - b).map(w => ({ w, graded: SETS.find(s => s.w === w && !s.practice), practice: SETS.find(s => s.w === w && s.practice) }));
+const LETTERS = 'ABCDEFGHIJKLMNOP';
+const KEY = 'nptel-ml-noc26-cs133-v1';
+
+let store = { ans: {}, study: false };
+try { const s = JSON.parse(localStorage.getItem(KEY)); if (s && s.ans) store = { ...store, ...s }; } catch (e) {}
+const save = () => { try { localStorage.setItem(KEY, JSON.stringify(store)); } catch (e) {} };
+
+const app = document.getElementById('app');
+let session = null;
+
+const I = {
+  back: '<svg viewBox="0 0 12 20"><path d="M10 2 2 10l8 8" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/></svg>',
+  next: '<svg viewBox="0 0 12 20" style="width:10px;height:17px"><path d="m2 2 8 8-8 8" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/></svg>',
+  chev: '<svg class="chev-r" viewBox="0 0 8 13"><path d="m1.5 1.5 5 5-5 5" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>',
+  shuffle: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M16 3h5v5M4 20 21 3M21 16v5h-5M15 15l6 6M4 4l5 5"/></svg>',
+  bolt: '<svg viewBox="0 0 24 24" fill="currentColor"><path d="M13 2 4 14h6l-1 8 9-12h-6z"/></svg>',
+  redo: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12a9 9 0 1 0 3-6.7L3 8"/><path d="M3 3v5h5"/></svg>',
+  book: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round"><path d="M2 4h6a4 4 0 0 1 4 4v13a3 3 0 0 0-3-3H2zM22 4h-6a4 4 0 0 0-4 4v13a3 3 0 0 1 3-3h7z"/></svg>',
+  check: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="m5 12.5 4.5 4.5L19 7.5"/></svg>',
+  cross: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round"><path d="M6 6l12 12M18 6 6 18"/></svg>',
+  checkC: '<svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2a10 10 0 1 0 0 20 10 10 0 0 0 0-20Zm-1.2 14.2-4-4 1.4-1.4 2.6 2.6 5.6-5.6 1.4 1.4z"/></svg>',
+  crossC: '<svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2a10 10 0 1 0 0 20 10 10 0 0 0 0-20Zm3.5 12.1-1.4 1.4-2.1-2.1-2.1 2.1-1.4-1.4 2.1-2.1-2.1-2.1 1.4-1.4 2.1 2.1 2.1-2.1 1.4 1.4-2.1 2.1z"/></svg>',
+  eye: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round"><path d="M2 12s3.6-7 10-7 10 7 10 7-3.6 7-10 7S2 12 2 12z"/><circle cx="12" cy="12" r="3"/></svg>',
+  bulb: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 18h6M10 22h4"/><path d="M12 2a7 7 0 0 0-4 12.7c.6.5 1 1.3 1 2.1V17h6v-.2c0-.8.4-1.6 1-2.1A7 7 0 0 0 12 2z"/></svg>',
+  stack: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="m12 3 9 5-9 5-9-5z"/><path d="m3 13 9 5 9-5"/></svg>',
+};
+
+const esc = s => String(s).replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
+const sameSet = (a, b) => a.length === b.length && a.every(x => b.includes(x));
+const shuffle = a => { a = a.slice(); for (let i = a.length - 1; i > 0; i--) { const j = Math.floor(Math.random() * (i + 1)); [a[i], a[j]] = [a[j], a[i]]; } return a; };
+const grade3 = p => p >= .8 ? 'good' : p >= .5 ? 'mid' : 'bad';
+const gradeColor = p => p >= .8 ? 'var(--green)' : p >= .5 ? 'var(--orange)' : 'var(--red)';
+const typeset = el => { if (window.renderMathInElement) { try { renderMathInElement(el, { delimiters: [{ left: '\\[', right: '\\]', display: true }, { left: '\\(', right: '\\)', display: false }], throwOnError: false, strict: 'ignore' }); } catch (e) {} } };
+const plain = h => { const d = document.createElement('div'); d.innerHTML = h; return d.textContent.replace(/\s+/g, ' ').trim(); };
+
+function score(s) {
+  let done = 0, ok = 0;
+  for (const q of s.qs) { const r = store.ans[q.id]; if (r) { done++; if (r.ok) ok++; } }
+  return { done, ok, total: s.qs.length };
+}
+function bigRing(frac, color, label, sub) {
+  const r = 40, c = 2 * Math.PI * r;
+  return `<svg class="big-ring" viewBox="0 0 100 100" aria-hidden="true"><circle cx="50" cy="50" r="${r}" fill="none" stroke="var(--fill2)" stroke-width="11"/>${frac > 0 ? `<circle cx="50" cy="50" r="${r}" fill="none" stroke="${color}" stroke-width="11" stroke-linecap="round" stroke-dasharray="${frac * c} ${c}" transform="rotate(-90 50 50)"/>` : ''}<text x="50" y="${sub ? 52 : 57}" text-anchor="middle" font-family="Plus Jakarta Sans, sans-serif" font-weight="800" font-size="${label.length > 3 ? 20 : 23}" fill="var(--label)">${label}</text>${sub ? `<text x="50" y="68" text-anchor="middle" font-family="Figtree, sans-serif" font-weight="600" font-size="10.5" fill="var(--label2)">${sub}</text>` : ''}</svg>`;
+}
+
+/* ---------------- home ---------------- */
+function renderHome() {
+  session = null;
+  const ids = Object.keys(store.ans).filter(id => BYID[id]);
+  const done = ids.length, ok = ids.filter(id => store.ans[id].ok).length;
+  const wrongIds = ids.filter(id => !store.ans[id].ok);
+  const gradedTotal = GRADED.reduce((n, s) => n + s.qs.length, 0);
+  const acc = done ? ok / done : 0;
+
+  const weekCard = ({ w, graded, practice }) => {
+    const c = WCOL[w % WCOL.length];
+    const [head, sub] = TOPICS[w] || ['Week ' + w, ''];
+    const main = graded || practice;
+    const sc = score(main);
+    const barW = sc.done / sc.total * 100;
+    const chip = (s, primary, label) => {
+      const k = score(s);
+      const meta = k.done ? `<span class="meta ${grade3(k.ok / k.done)}">${k.ok}/${k.total}</span>` : `<span class="meta">${k.total} Qs</span>`;
+      return `<button class="chip ${primary ? 'primary' : ''}" data-set="${s.i}"><span>${label}</span>${meta}</button>`;
+    };
+    return `<article class="wk" style="--c:${c}">
+      <div class="wk-top"><span class="wk-num">${w}</span><div style="min-width:0"><div class="wk-label">Week ${w}</div><h3>${head}</h3></div></div>
+      <p class="wk-sub">${sub}</p>
+      <div class="wk-bar" title="${sc.done} of ${sc.total} answered"><i style="width:${barW}%;background:${sc.done ? gradeColor(sc.ok / sc.done) : 'transparent'}"></i></div>
+      <div class="wk-actions">${graded ? chip(graded, true, 'Assignment') : ''}${practice ? chip(practice, !graded, graded ? 'Practice' : 'Practice set') : ''}</div>
+    </article>`;
+  };
+
+  app.innerHTML = `
+  <div class="wrap home fade">
+    <header class="hero">
+      <div><div class="eyebrow">NPTEL · Introduction to ML</div><h1>ML Revision</h1></div>
+      <span class="course-tag">noc26_cs133</span>
+    </header>
+
+    <section class="summary">
+      ${bigRing(done / ALLQ.length, 'var(--blue)', Math.round(done / ALLQ.length * 100) + '%', 'done')}
+      <div class="summary-main">
+        <div class="summary-title">${done ? (done === ALLQ.length ? 'Every question attempted' : 'Keep going') : 'Ready when you are'}</div>
+        <div class="summary-sub">${done ? `${done} of ${ALLQ.length} questions answered` : `${ALLQ.length} questions across 13 weeks, with official answers`}</div>
+        <div class="metrics">
+          <div class="metric"><b class="num" style="color:${done ? gradeColor(acc) : 'var(--label)'}">${done ? Math.round(acc * 100) + '%' : '–'}</b><span>Accuracy</span></div>
+          <div class="metric"><b class="num" style="color:var(--green)">${ok}</b><span>Correct</span></div>
+          <div class="metric"><b class="num" style="color:${wrongIds.length ? 'var(--red)' : 'var(--label)'}">${wrongIds.length}</b><span>To review</span></div>
+        </div>
+      </div>
+    </section>
+
+    <div class="tiles">
+      <button class="tile" data-act="mock"><span class="ic" style="background:var(--indigo)">${I.stack}</span><span><b>Mock test</b><small>All ${gradedTotal} graded, shuffled</small></span></button>
+      <button class="tile" data-act="quick"><span class="ic" style="background:var(--orange)">${I.bolt}</span><span><b>Quick 20</b><small>Random graded mix</small></span></button>
+      <button class="tile" data-act="mistakes" ${wrongIds.length ? '' : 'disabled'}><span class="ic" style="background:var(--red)">${I.redo}</span>${wrongIds.length ? `<span class="corner num" style="color:var(--red)">${wrongIds.length}</span>` : ''}<span><b>Mistakes</b><small>${wrongIds.length ? 'Retry what you missed' : 'None yet'}</small></span></button>
+      <button class="tile ${store.study ? 'on' : ''}" data-act="study" role="switch" aria-checked="${store.study}"><span class="ic" style="background:var(--green)">${I.book}</span><span class="switch"><i></i></span><span><b>Study mode</b><small>${store.study ? 'Answers shown' : 'Answers hidden'}</small></span></button>
+    </div>
+
+    <div class="sec-h"><h2>Weeks</h2><span>Assignment = graded · Practice = non-graded</span></div>
+    <div class="weeks">${WEEKS.map(weekCard).join('')}</div>
+
+    <div class="foot">
+      <span>Answers come from NPTEL’s official key. Progress stays in this browser.</span>
+      <button data-act="reset" id="reset">Reset progress</button>
+    </div>
+  </div>`;
+
+  app.querySelectorAll('[data-set]').forEach(b => b.onclick = () => {
+    const s = SETS[+b.dataset.set];
+    start(`Week ${s.w} · ${s.practice ? 'Practice' : 'Assignment'}`, (TOPICS[s.w] || [''])[0], s.qs.map(q => q.id), false);
+  });
+  app.querySelector('[data-act=mock]').onclick = () => start('Mock test', `${gradedTotal} graded questions`, shuffle(GRADED.flatMap(s => s.qs.map(q => q.id))), true);
+  app.querySelector('[data-act=quick]').onclick = () => start('Quick 20', 'Random graded questions', shuffle(GRADED.flatMap(s => s.qs.map(q => q.id))).slice(0, 20), true);
+  app.querySelector('[data-act=mistakes]').onclick = () => wrongIds.length && start('Mistakes', `${wrongIds.length} to retry`, shuffle(wrongIds), true);
+  app.querySelector('[data-act=study]').onclick = () => { store.study = !store.study; save(); renderHome(); };
+  let armed = false;
+  const rs = app.querySelector('#reset');
+  rs.onclick = () => {
+    if (!armed) { armed = true; rs.textContent = 'Tap again to erase all answers'; setTimeout(() => { armed = false; if (rs.isConnected) rs.textContent = 'Reset progress'; }, 3000); return; }
+    store.ans = {}; save(); renderHome();
+  };
+}
+
+/* ---------------- quiz ---------------- */
+function start(title, subtitle, ids, mixed) {
+  session = { title, subtitle, ids, mixed, idx: 0, res: {}, seen: {}, sel: [], revealed: false };
+  history.pushState({ v: 'quiz' }, '');
+  renderQuiz();
+  window.scrollTo(0, 0);
+}
+
+function stripHtml(s) {
+  if (s.ids.length > 48) {
+    const n = s.ids.length, ok = s.ids.filter(id => s.res[id]?.ok).length, no = s.ids.filter(id => s.res[id] && !s.res[id].ok).length;
+    return `<div class="linebar" title="${ok} right, ${no} wrong"><i style="width:${ok / n * 100}%;background:var(--green)"></i><i style="width:${no / n * 100}%;background:var(--red)"></i></div>`;
+  }
+  return `<div class="strip">${s.ids.map((id, i) => {
+    const r = s.res[id];
+    const cls = i === s.idx ? 'cur' : r ? (r.ok ? 'ok' : 'no') : s.seen[id] ? 'seen' : '';
+    return `<button class="${cls}" data-go="${i}" aria-label="Question ${i + 1}"></button>`;
+  }).join('')}</div>`;
+}
+
+function renderQuiz() {
+  const s = session, q = BYID[s.ids[s.idx]], set = SETS[q.set];
+  const prior = s.res[q.id];
+  if (prior) { s.sel = prior.sel.slice(); s.revealed = true; }
+  else if (store.study) s.revealed = true;
+  const multi = q.m || q.a.length > 1;
+  const last = s.idx === s.ids.length - 1;
+  const graded = !!prior;
+
+  const optHtml = q.o.map((o, k) => {
+    let cls = 'opt' + (multi ? ' multi' : ''), mark = '';
+    const isAns = q.a.includes(k), isSel = s.sel.includes(k);
+    if (s.revealed) {
+      if (isAns && isSel) { cls += ' right'; mark = `<span class="mark" style="color:var(--green)">${I.checkC}</span>`; }
+      else if (isSel) { cls += ' wrong'; mark = `<span class="mark" style="color:var(--red)">${I.crossC}</span>`; }
+      else if (isAns) { cls += graded ? ' missed' : ' right'; mark = `<span class="mark" style="color:var(--green)">${I.checkC}</span>`; }
+      else cls += ' dim';
+    } else if (isSel) cls += ' sel';
+    return `<button class="${cls}" data-k="${k}" ${s.revealed ? 'disabled' : ''} aria-pressed="${isSel}"><span class="key">${LETTERS[k]}</span><span class="body">${o || '<i style="color:var(--label3)">(blank)</i>'}</span>${mark}</button>`;
+  }).join('');
+
+  const ansText = q.a.map(k => LETTERS[k]).join(', ');
+  let fb = '';
+  if (s.revealed) {
+    if (prior && prior.ok) fb = `<div class="feedback ok"><span class="fi">${I.check}</span><div><b>Correct</b><span>${multi ? 'You got every right option.' : 'Nice one.'}</span></div></div>`;
+    else if (prior) fb = `<div class="feedback no"><span class="fi">${I.cross}</span><div><b>Not quite</b><span>Correct answer${q.a.length > 1 ? 's' : ''}: <strong style="color:var(--label)">${ansText}</strong></span></div></div>`;
+    else fb = `<div class="feedback key"><span class="fi">${I.eye}</span><div><b>Answer: ${ansText}</b><span>${store.study ? 'Study mode is on' : 'Revealed without answering'}</span></div></div>`;
+  }
+
+  let label, act, disabled = false, green = false;
+  if (!s.revealed && multi) { label = 'Check answer'; act = 'check'; disabled = !s.sel.length; }
+  else if (!s.revealed) { label = last ? 'See results' : 'Skip'; act = last ? 'finish' : 'next'; }
+  else { label = last ? 'See results' : 'Next question'; act = last ? 'finish' : 'next'; green = !!(prior && prior.ok); }
+
+  const answered = Object.keys(s.res).length;
+  // Only animate what is new: a new question, a just-revealed answer, a just-opened hint.
+  const fresh = s.lastId !== q.id;
+  const newReveal = s.revealed && (fresh || !s.lastRevealed);
+  const newHint = s.hint && (fresh || !s.lastHint);
+  const keep = fresh ? {} : { qcard: app.querySelector('.qcard'), hintbox: app.querySelector('.hintbox') };
+  app.innerHTML = `
+  <nav class="nav"><div class="nav-in">
+    <button class="nav-btn" data-act="back">${I.back}<span>Home</span></button>
+    <div class="nav-title"><b>${esc(s.title)}</b><small>${esc(s.subtitle || '')}</small></div>
+    <div class="nav-right">${answered ? '<button class="nav-btn" data-act="finish" style="font-weight:600">Finish</button>' : ''}</div>
+  </div></nav>
+  <div class="wrap quiz">
+    ${stripHtml(s)}
+    <div class="qhead">
+      <span class="qno num">Question ${s.idx + 1} <span>/ ${s.ids.length}</span></span>
+      ${s.mixed ? `<span class="pill">Week ${set.w}${set.practice ? ' practice' : ''} · Q${q.n}</span>` : ''}
+      ${multi ? `<span class="pill multi">${I.check} Select all that apply</span>` : ''}
+    </div>
+    <div class="qcard${fresh ? ' fade' : ''}">${q.q}</div>
+    <div class="side"><div class="opts">${optHtml}</div>
+    ${fb}
+    ${s.revealed && q.e ? `<div class="explain${newReveal ? ' fade' : ''}"><div class="ex-h">${I.bulb}Why this is the answer</div><div class="ex-b">${q.e}</div>${q.h ? `<div class="ex-hint"><b>Hint</b> ${q.h}</div>` : ''}</div>` : ''}
+    ${!s.revealed && s.hint && q.h ? `<div class="hintbox${newHint ? ' fade' : ''}"><div class="ex-h">${I.bulb}Hint</div><div class="ex-b">${q.h}</div></div>` : ''}
+    ${!s.revealed ? `<div class="tools">${q.h ? `<button class="reveal" data-act="hint">${I.bulb}${s.hint ? 'Hide hint' : 'Get a hint'}</button>` : ''}<button class="reveal" data-act="reveal">${I.eye}Show answer</button></div>` : ''}
+    </div>
+    <div class="hint"><span class="kbd">1</span>–<span class="kbd">9</span> choose · <span class="kbd">Enter</span> check / next · <span class="kbd">←</span> <span class="kbd">→</span> move · <span class="kbd">Esc</span> home</div>
+  </div>
+  <div class="actionbar"><div class="actionbar-in">
+    <button class="btn icon" data-act="prev" ${s.idx === 0 ? 'disabled' : ''} aria-label="Previous question">${I.back.replace('<svg', '<svg style="width:10px;height:17px"')}</button>
+    <button class="btn primary ${green ? 'go-green' : ''}" data-act="${act}" id="primary" ${disabled ? 'disabled' : ''}>${label}${act === 'next' ? I.next : ''}</button>
+  </div></div>`;
+
+  for (const [cls, node] of Object.entries(keep)) { const fresh_ = app.querySelector('.' + cls); if (node && fresh_) { node.classList.remove('fade'); fresh_.replaceWith(node); } }
+  if (!newReveal) app.querySelectorAll('.feedback').forEach(f => f.style.animation = 'none');
+  s.lastId = q.id; s.lastRevealed = s.revealed; s.lastHint = s.hint;
+  s.seen[q.id] = true;
+  typeset(app);
+  app.querySelectorAll('.opt').forEach(b => b.onclick = () => choose(+b.dataset.k));
+  app.querySelectorAll('[data-act]').forEach(b => b.onclick = () => act_(b.dataset.act));
+  app.querySelectorAll('[data-go]').forEach(b => b.onclick = () => go(+b.dataset.go));
+}
+
+function choose(k) {
+  const s = session; if (!s || s.revealed) return;
+  const q = BYID[s.ids[s.idx]];
+  if (k >= q.o.length) return;
+  if (q.m || q.a.length > 1) { s.sel = s.sel.includes(k) ? s.sel.filter(x => x !== k) : [...s.sel, k]; renderQuiz(); }
+  else { s.sel = [k]; grade(); }
+}
+function grade() {
+  const s = session, q = BYID[s.ids[s.idx]];
+  const ok = sameSet(s.sel, q.a);
+  s.res[q.id] = { sel: s.sel.slice(), ok };
+  store.ans[q.id] = { ok, t: Date.now() }; save();
+  s.revealed = true; renderQuiz();
+}
+function go(i) {
+  const s = session; if (!s || i < 0 || i >= s.ids.length) return;
+  s.idx = i; s.sel = []; s.revealed = false; s.hint = false; renderQuiz(); window.scrollTo(0, 0);
+}
+function act_(a) {
+  const s = session;
+  if (a === 'back') return history.back();
+  if (a === 'prev') go(s.idx - 1);
+  if (a === 'next') go(s.idx + 1);
+  if (a === 'check' && s.sel.length) grade();
+  if (a === 'reveal') { s.revealed = true; renderQuiz(); }
+  if (a === 'hint') { s.hint = !s.hint; renderQuiz(); }
+  if (a === 'finish') renderResults();
+}
+
+/* ---------------- results ---------------- */
+function renderResults() {
+  const s = session;
+  const ids = Object.keys(s.res);
+  const ok = ids.filter(id => s.res[id].ok).length;
+  const wrong = ids.filter(id => !s.res[id].ok);
+  const skipped = s.ids.length - ids.length;
+  const pct = ids.length ? ok / ids.length : 0;
+  const msg = !ids.length ? 'You didn’t answer any questions this time.' : pct >= .8 ? 'Strong result. This topic looks exam-ready.' : pct >= .5 ? 'Solid base. Go over the misses once more.' : 'Worth another pass before the exam.';
+  const r = 62, c = 2 * Math.PI * r;
+  app.innerHTML = `
+  <nav class="nav"><div class="nav-in">
+    <button class="nav-btn" data-act="home">${I.back}<span>Home</span></button>
+    <div class="nav-title"><b>Results</b><small>${esc(s.title)}</small></div><div></div>
+  </div></nav>
+  <div class="wrap fade">
+    <div class="result">
+      <svg viewBox="0 0 150 150" aria-hidden="true"><circle cx="75" cy="75" r="${r}" fill="none" stroke="var(--fill2)" stroke-width="14"/>${pct > 0 ? `<circle cx="75" cy="75" r="${r}" fill="none" stroke="${gradeColor(pct)}" stroke-width="14" stroke-linecap="round" stroke-dasharray="${pct * c} ${c}" transform="rotate(-90 75 75)"/>` : ''}<text x="75" y="84" text-anchor="middle" font-family="Plus Jakarta Sans, sans-serif" font-weight="800" font-size="32" fill="var(--label)">${Math.round(pct * 100)}%</text></svg>
+      <h2>${ok} of ${ids.length} correct</h2>
+      <p>${msg}</p>
+      <div class="tally">
+        <span style="background:var(--green-bg);color:var(--green)">${ok} right</span>
+        <span style="background:var(--red-bg);color:var(--red)">${wrong.length} wrong</span>
+        ${skipped ? `<span style="background:var(--fill);color:var(--label2)">${skipped} skipped</span>` : ''}
+      </div>
+    </div>
+    <div class="stack">
+      ${wrong.length ? `<button class="btn primary" data-act="retry">${I.redo.replace('<svg', '<svg style="width:18px;height:18px"')}Retry the ${wrong.length} I missed</button>` : ''}
+      <button class="btn secondary" data-act="again">Start this set again</button>
+    </div>
+    ${wrong.length ? `<div class="sec-h"><h2>Missed</h2><span>Tap to revisit</span></div>${wrong.map(id => { const q = BYID[id], set = SETS[q.set], col = WCOL[set.w % WCOL.length]; return `<button class="miss" data-jump="${id}" style="--c:${col}"><span class="wk-num">${set.w}</span><span class="t"><b>Week ${set.w}${set.practice ? ' practice' : ''} · Q${q.n}</b><span>${esc(plain(q.q).slice(0, 140))}</span></span>${I.chev}</button>`; }).join('')}` : ''}
+  </div>`;
+  app.querySelector('[data-act=home]').onclick = () => history.back();
+  const rt = app.querySelector('[data-act=retry]');
+  if (rt) rt.onclick = () => { session = { title: 'Retry', subtitle: s.title, ids: wrong, mixed: true, idx: 0, res: {}, seen: {}, sel: [], revealed: false }; renderQuiz(); window.scrollTo(0, 0); };
+  app.querySelector('[data-act=again]').onclick = () => { session = { ...s, idx: 0, res: {}, seen: {}, sel: [], revealed: false, ids: s.mixed ? shuffle(s.ids) : s.ids }; renderQuiz(); window.scrollTo(0, 0); };
+  app.querySelectorAll('[data-jump]').forEach(b => b.onclick = () => go(s.ids.indexOf(b.dataset.jump)));
+  window.scrollTo(0, 0);
+}
+
+window.addEventListener('popstate', () => { if (session) renderHome(); });
+document.addEventListener('keydown', e => {
+  if (!session || e.metaKey || e.ctrlKey || e.altKey) return;
+  const p = document.getElementById('primary');
+  if (!p) { if (e.key === 'Escape') history.back(); return; }
+  if (/^[1-9]$/.test(e.key)) choose(+e.key - 1);
+  else if (e.key.length === 1 && /[a-p]/i.test(e.key)) choose(LETTERS.indexOf(e.key.toUpperCase()));
+  else if (e.key === 'Enter') { if (!p.disabled) { e.preventDefault(); p.click(); } }
+  else if (e.key === 'ArrowRight') go(session.idx + 1);
+  else if (e.key === 'ArrowLeft') go(session.idx - 1);
+  else if (e.key === 'Escape') history.back();
+});
+
+history.replaceState({ v: 'home' }, '');
+renderHome();
+</script>
+</body>
+</html>
