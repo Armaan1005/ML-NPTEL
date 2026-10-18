@@ -243,6 +243,53 @@ h1{font-family:var(--display); font-weight:800; font-size:clamp(32px, 7vw, 40px)
   .quiz .opts{margin-top:14px}
 }
 @media (min-width:1200px){ .weeks{grid-template-columns:repeat(3, minmax(0,1fr))} }
+
+/* ---------- motion ---------- */
+::view-transition-old(root), ::view-transition-new(root){animation-duration:.42s; animation-timing-function:cubic-bezier(.22,.8,.24,1)}
+html[data-nav=forward]::view-transition-old(root){animation-name:vt-out-left}
+html[data-nav=forward]::view-transition-new(root){animation-name:vt-in-right}
+html[data-nav=back]::view-transition-old(root){animation-name:vt-out-right}
+html[data-nav=back]::view-transition-new(root){animation-name:vt-in-left}
+@keyframes vt-out-left{to{transform:translateX(-22%); opacity:0}}
+@keyframes vt-in-right{from{transform:translateX(30%); opacity:0}}
+@keyframes vt-out-right{to{transform:translateX(22%); opacity:0}}
+@keyframes vt-in-left{from{transform:translateX(-30%); opacity:0}}
+
+.rise{animation:rise .5s cubic-bezier(.2,.8,.2,1) both; animation-delay:calc(var(--i, 0) * 35ms + 40ms)}
+.rise-kids > *{animation:rise .5s cubic-bezier(.2,.8,.2,1) both}
+.rise-kids > :nth-child(1){animation-delay:60ms} .rise-kids > :nth-child(2){animation-delay:100ms}
+.rise-kids > :nth-child(3){animation-delay:140ms} .rise-kids > :nth-child(4){animation-delay:180ms}
+@keyframes rise{from{opacity:0; transform:translateY(14px) scale(.985)} to{opacity:1; transform:none}}
+.rise .wk-bar i{animation:bar-in .8s cubic-bezier(.2,.8,.2,1) both; animation-delay:calc(var(--i, 0) * 35ms + 250ms)}
+@keyframes bar-in{from{width:0}}
+.arc{animation:draw 1s cubic-bezier(.3,.8,.25,1) both .15s}
+@keyframes draw{from{stroke-dasharray:0 999}}
+
+.wk{transition:transform .25s cubic-bezier(.2,.8,.2,1), box-shadow .25s}
+@media (hover:hover){ .wk:hover{transform:translateY(-3px); box-shadow:var(--shadow-hi)} .tile:not([disabled]):hover{transform:translateY(-2px); box-shadow:var(--shadow-hi)} }
+.chip:active{transform:scale(.94)}
+
+.slide-next{animation:slide-next .38s cubic-bezier(.2,.8,.2,1) both}
+.slide-prev{animation:slide-prev .38s cubic-bezier(.2,.8,.2,1) both}
+.side.slide-next, .side.slide-prev{animation-delay:.05s}
+@keyframes slide-next{from{opacity:0; transform:translateX(28px)} to{opacity:1; transform:none}}
+@keyframes slide-prev{from{opacity:0; transform:translateX(-28px)} to{opacity:1; transform:none}}
+
+.opt.tap .key{animation:key-pop .32s cubic-bezier(.3,1.6,.5,1)}
+@keyframes key-pop{0%{transform:scale(.7)} 100%{transform:scale(1)}}
+.reveal-anim .opt.right, .reveal-anim .opt.missed{animation:good .5s cubic-bezier(.3,1.4,.5,1)}
+.reveal-anim .opt.wrong{animation:shake .42s cubic-bezier(.36,.07,.19,.97)}
+@keyframes good{0%{transform:scale(.97)} 55%{transform:scale(1.02)} 100%{transform:none}}
+@keyframes shake{10%,90%{transform:translateX(-2px)} 20%,80%{transform:translateX(4px)} 30%,50%,70%{transform:translateX(-7px)} 40%,60%{transform:translateX(7px)}}
+.btn.bump{animation:bump .45s cubic-bezier(.3,1.6,.5,1)}
+@keyframes bump{0%{transform:scale(.95)} 100%{transform:none}}
+
+.hintbox{overflow:hidden}
+.hintbox.grow{animation:grow .34s cubic-bezier(.2,.8,.2,1) both}
+.hintbox.shrink{animation:shrink .26s cubic-bezier(.4,0,.6,1) both}
+@keyframes grow{from{max-height:0; opacity:0; padding-block:0; margin-top:0; transform:translateY(-6px)} to{max-height:var(--h); opacity:1}}
+@keyframes shrink{from{max-height:var(--h); opacity:1} to{max-height:0; opacity:0; padding-block:0; margin-top:0; transform:translateY(-6px)}}
+@media (prefers-reduced-motion: reduce){ ::view-transition-old(root), ::view-transition-new(root){animation:none!important} }
 </style>
 </head>
 <body>
@@ -317,11 +364,11 @@ function score(s) {
 }
 function bigRing(frac, color, label, sub) {
   const r = 40, c = 2 * Math.PI * r;
-  return `<svg class="big-ring" viewBox="0 0 100 100" aria-hidden="true"><circle cx="50" cy="50" r="${r}" fill="none" stroke="var(--fill2)" stroke-width="11"/>${frac > 0 ? `<circle cx="50" cy="50" r="${r}" fill="none" stroke="${color}" stroke-width="11" stroke-linecap="round" stroke-dasharray="${frac * c} ${c}" transform="rotate(-90 50 50)"/>` : ''}<text x="50" y="${sub ? 52 : 57}" text-anchor="middle" font-family="Plus Jakarta Sans, sans-serif" font-weight="800" font-size="${label.length > 3 ? 20 : 23}" fill="var(--label)">${label}</text>${sub ? `<text x="50" y="68" text-anchor="middle" font-family="Figtree, sans-serif" font-weight="600" font-size="10.5" fill="var(--label2)">${sub}</text>` : ''}</svg>`;
+  return `<svg class="big-ring" viewBox="0 0 100 100" aria-hidden="true"><circle cx="50" cy="50" r="${r}" fill="none" stroke="var(--fill2)" stroke-width="11"/>${frac > 0 ? `<circle class="arc" cx="50" cy="50" r="${r}" fill="none" stroke="${color}" stroke-width="11" stroke-linecap="round" stroke-dasharray="${frac * c} ${c}" transform="rotate(-90 50 50)"/>` : ''}<text x="50" y="${sub ? 52 : 57}" text-anchor="middle" font-family="Plus Jakarta Sans, sans-serif" font-weight="800" font-size="${label.length > 3 ? 20 : 23}" fill="var(--label)">${label}</text>${sub ? `<text x="50" y="68" text-anchor="middle" font-family="Figtree, sans-serif" font-weight="600" font-size="10.5" fill="var(--label2)">${sub}</text>` : ''}</svg>`;
 }
 
 /* ---------------- home ---------------- */
-function renderHome() {
+function renderHome(anim = true) {
   session = null;
   const ids = Object.keys(store.ans).filter(id => BYID[id]);
   const done = ids.length, ok = ids.filter(id => store.ans[id].ok).length;
@@ -329,7 +376,7 @@ function renderHome() {
   const gradedTotal = GRADED.reduce((n, s) => n + s.qs.length, 0);
   const acc = done ? ok / done : 0;
 
-  const weekCard = ({ w, graded, practice }) => {
+  const weekCard = ({ w, graded, practice }, idx) => {
     const c = WCOL[w % WCOL.length];
     const [head, sub] = TOPICS[w] || ['Week ' + w, ''];
     const main = graded || practice;
@@ -340,7 +387,7 @@ function renderHome() {
       const meta = k.done ? `<span class="meta ${grade3(k.ok / k.done)}">${k.ok}/${k.total}</span>` : `<span class="meta">${k.total} Qs</span>`;
       return `<button class="chip ${primary ? 'primary' : ''}" data-set="${s.i}"><span>${label}</span>${meta}</button>`;
     };
-    return `<article class="wk" style="--c:${c}">
+    return `<article class="wk${anim ? ' rise' : ''}" style="--c:${c};--i:${idx}">
       <div class="wk-top"><span class="wk-num">${w}</span><div style="min-width:0"><div class="wk-label">Week ${w}</div><h3>${head}</h3></div></div>
       <p class="wk-sub">${sub}</p>
       <div class="wk-bar" title="${sc.done} of ${sc.total} answered"><i style="width:${barW}%;background:${sc.done ? gradeColor(sc.ok / sc.done) : 'transparent'}"></i></div>
@@ -349,13 +396,13 @@ function renderHome() {
   };
 
   app.innerHTML = `
-  <div class="wrap home fade">
+  <div class="wrap home${anim ? ' fade' : ''}">
     <header class="hero">
       <div><div class="eyebrow">NPTEL · Introduction to ML</div><h1>ML Revision</h1></div>
       <span class="course-tag">noc26_cs133</span>
     </header>
 
-    <section class="summary">
+    <section class="summary${anim ? ' rise' : ''}" style="--i:0">
       ${bigRing(done / ALLQ.length, 'var(--blue)', Math.round(done / ALLQ.length * 100) + '%', 'done')}
       <div class="summary-main">
         <div class="summary-title">${done ? (done === ALLQ.length ? 'Every question attempted' : 'Keep going') : 'Ready when you are'}</div>
@@ -368,7 +415,7 @@ function renderHome() {
       </div>
     </section>
 
-    <div class="tiles">
+    <div class="tiles${anim ? ' rise-kids' : ''}">
       <button class="tile" data-act="mock"><span class="ic" style="background:var(--indigo)">${I.stack}</span><span><b>Mock test</b><small>All ${gradedTotal} graded, shuffled</small></span></button>
       <button class="tile" data-act="quick"><span class="ic" style="background:var(--orange)">${I.bolt}</span><span><b>Quick 20</b><small>Random graded mix</small></span></button>
       <button class="tile" data-act="mistakes" ${wrongIds.length ? '' : 'disabled'}><span class="ic" style="background:var(--red)">${I.redo}</span>${wrongIds.length ? `<span class="corner num" style="color:var(--red)">${wrongIds.length}</span>` : ''}<span><b>Mistakes</b><small>${wrongIds.length ? 'Retry what you missed' : 'None yet'}</small></span></button>
@@ -376,7 +423,7 @@ function renderHome() {
     </div>
 
     <div class="sec-h"><h2>Weeks</h2><span>Assignment = graded · Practice = non-graded</span></div>
-    <div class="weeks">${WEEKS.map(weekCard).join('')}</div>
+    <div class="weeks">${WEEKS.map((w, i) => weekCard(w, i)).join('')}</div>
 
     <div class="foot">
       <span>Answers come from NPTEL’s official key. Progress stays in this browser.</span>
@@ -391,21 +438,29 @@ function renderHome() {
   app.querySelector('[data-act=mock]').onclick = () => start('Mock test', `${gradedTotal} graded questions`, shuffle(GRADED.flatMap(s => s.qs.map(q => q.id))), true);
   app.querySelector('[data-act=quick]').onclick = () => start('Quick 20', 'Random graded questions', shuffle(GRADED.flatMap(s => s.qs.map(q => q.id))).slice(0, 20), true);
   app.querySelector('[data-act=mistakes]').onclick = () => wrongIds.length && start('Mistakes', `${wrongIds.length} to retry`, shuffle(wrongIds), true);
-  app.querySelector('[data-act=study]').onclick = () => { store.study = !store.study; save(); renderHome(); };
+  app.querySelector('[data-act=study]').onclick = e => { store.study = !store.study; save(); const tl = e.currentTarget; tl.classList.toggle('on', store.study); tl.setAttribute('aria-checked', store.study); tl.querySelector('small').textContent = store.study ? 'Answers shown' : 'Answers hidden'; };
   let armed = false;
   const rs = app.querySelector('#reset');
   rs.onclick = () => {
     if (!armed) { armed = true; rs.textContent = 'Tap again to erase all answers'; setTimeout(() => { armed = false; if (rs.isConnected) rs.textContent = 'Reset progress'; }, 3000); return; }
-    store.ans = {}; save(); renderHome();
+    store.ans = {}; save(); renderHome(false);
   };
+}
+
+/* ---------------- page transitions ---------------- */
+const REDUCED = matchMedia('(prefers-reduced-motion: reduce)').matches;
+function navigate(dir, fn) {
+  const run = () => { fn(); window.scrollTo(0, 0); };
+  if (REDUCED || !document.startViewTransition) return run();
+  document.documentElement.dataset.nav = dir;
+  document.startViewTransition(run).finished.finally(() => { delete document.documentElement.dataset.nav; });
 }
 
 /* ---------------- quiz ---------------- */
 function start(title, subtitle, ids, mixed) {
   session = { title, subtitle, ids, mixed, idx: 0, res: {}, seen: {}, sel: [], revealed: false };
   history.pushState({ v: 'quiz' }, '');
-  renderQuiz();
-  window.scrollTo(0, 0);
+  navigate('forward', renderQuiz);
 }
 
 function stripHtml(s) {
@@ -428,6 +483,7 @@ function renderQuiz() {
   const multi = q.m || q.a.length > 1;
   const last = s.idx === s.ids.length - 1;
   const graded = !!prior;
+  const fresh = s.lastId !== q.id;
 
   const optHtml = q.o.map((o, k) => {
     let cls = 'opt' + (multi ? ' multi' : ''), mark = '';
@@ -438,6 +494,7 @@ function renderQuiz() {
       else if (isAns) { cls += graded ? ' missed' : ' right'; mark = `<span class="mark" style="color:var(--green)">${I.checkC}</span>`; }
       else cls += ' dim';
     } else if (isSel) cls += ' sel';
+    if (!fresh && k === s.justK) cls += ' tap';
     return `<button class="${cls}" data-k="${k}" ${s.revealed ? 'disabled' : ''} aria-pressed="${isSel}"><span class="key">${LETTERS[k]}</span><span class="body">${o || '<i style="color:var(--label3)">(blank)</i>'}</span>${mark}</button>`;
   }).join('');
 
@@ -456,7 +513,6 @@ function renderQuiz() {
 
   const answered = Object.keys(s.res).length;
   // Only animate what is new: a new question, a just-revealed answer, a just-opened hint.
-  const fresh = s.lastId !== q.id;
   const newReveal = s.revealed && (fresh || !s.lastRevealed);
   const newHint = s.hint && (fresh || !s.lastHint);
   const keep = fresh ? {} : { qcard: app.querySelector('.qcard'), hintbox: app.querySelector('.hintbox') };
@@ -473,11 +529,11 @@ function renderQuiz() {
       ${s.mixed ? `<span class="pill">Week ${set.w}${set.practice ? ' practice' : ''} · Q${q.n}</span>` : ''}
       ${multi ? `<span class="pill multi">${I.check} Select all that apply</span>` : ''}
     </div>
-    <div class="qcard${fresh ? ' fade' : ''}">${q.q}</div>
-    <div class="side"><div class="opts">${optHtml}</div>
+    <div class="qcard${fresh ? ' slide-' + (s.dir || 'next') : ''}">${q.q}</div>
+    <div class="side${fresh ? ' slide-' + (s.dir || 'next') : ''}"><div class="opts${newReveal && prior && !fresh ? ' reveal-anim' : ''}">${optHtml}</div>
     ${fb}
     ${s.revealed && q.e ? `<div class="explain${newReveal ? ' fade' : ''}"><div class="ex-h">${I.bulb}Why this is the answer</div><div class="ex-b">${q.e}</div>${q.h ? `<div class="ex-hint"><b>Hint</b> ${q.h}</div>` : ''}</div>` : ''}
-    ${!s.revealed && s.hint && q.h ? `<div class="hintbox${newHint ? ' fade' : ''}"><div class="ex-h">${I.bulb}Hint</div><div class="ex-b">${q.h}</div></div>` : ''}
+    ${!s.revealed && s.hint && q.h ? `<div class="hintbox"><div class="ex-h">${I.bulb}Hint</div><div class="ex-b">${q.h}</div></div>` : ''}
     ${!s.revealed ? `<div class="tools">${q.h ? `<button class="reveal" data-act="hint">${I.bulb}${s.hint ? 'Hide hint' : 'Get a hint'}</button>` : ''}<button class="reveal" data-act="reveal">${I.eye}Show answer</button></div>` : ''}
     </div>
     <div class="hint"><span class="kbd">1</span>–<span class="kbd">9</span> choose · <span class="kbd">Enter</span> check / next · <span class="kbd">←</span> <span class="kbd">→</span> move · <span class="kbd">Esc</span> home</div>
@@ -487,8 +543,11 @@ function renderQuiz() {
     <button class="btn primary ${green ? 'go-green' : ''}" data-act="${act}" id="primary" ${disabled ? 'disabled' : ''}>${label}${act === 'next' ? I.next : ''}</button>
   </div></div>`;
 
-  for (const [cls, node] of Object.entries(keep)) { const fresh_ = app.querySelector('.' + cls); if (node && fresh_) { node.classList.remove('fade'); fresh_.replaceWith(node); } }
+  for (const [cls, node] of Object.entries(keep)) { const fresh_ = app.querySelector('.' + cls); if (node && fresh_) { node.classList.remove('fade', 'grow', 'slide-next', 'slide-prev'); fresh_.replaceWith(node); } }
   if (!newReveal) app.querySelectorAll('.feedback').forEach(f => f.style.animation = 'none');
+  const hb = app.querySelector('.hintbox');
+  if (hb && newHint && !REDUCED) { hb.style.setProperty('--h', hb.scrollHeight + 'px'); hb.classList.add('grow'); }
+  if (newReveal && prior && prior.ok && !fresh) app.querySelector('#primary')?.classList.add('bump');
   s.lastId = q.id; s.lastRevealed = s.revealed; s.lastHint = s.hint;
   s.seen[q.id] = true;
   typeset(app);
@@ -501,7 +560,7 @@ function choose(k) {
   const s = session; if (!s || s.revealed) return;
   const q = BYID[s.ids[s.idx]];
   if (k >= q.o.length) return;
-  if (q.m || q.a.length > 1) { s.sel = s.sel.includes(k) ? s.sel.filter(x => x !== k) : [...s.sel, k]; renderQuiz(); }
+  if (q.m || q.a.length > 1) { s.sel = s.sel.includes(k) ? s.sel.filter(x => x !== k) : [...s.sel, k]; s.justK = k; renderQuiz(); s.justK = null; }
   else { s.sel = [k]; grade(); }
 }
 function grade() {
@@ -513,6 +572,7 @@ function grade() {
 }
 function go(i) {
   const s = session; if (!s || i < 0 || i >= s.ids.length) return;
+  s.dir = i < s.idx ? 'prev' : 'next';
   s.idx = i; s.sel = []; s.revealed = false; s.hint = false; renderQuiz(); window.scrollTo(0, 0);
 }
 function act_(a) {
@@ -522,8 +582,22 @@ function act_(a) {
   if (a === 'next') go(s.idx + 1);
   if (a === 'check' && s.sel.length) grade();
   if (a === 'reveal') { s.revealed = true; renderQuiz(); }
-  if (a === 'hint') { s.hint = !s.hint; renderQuiz(); }
-  if (a === 'finish') renderResults();
+  if (a === 'hint') {
+    const hb = app.querySelector('.hintbox');
+    if (s.hint && hb && !REDUCED) {
+      if (s.closing) return;
+      s.closing = true;
+      const btn = app.querySelector('[data-act=hint]');
+      if (btn) btn.lastChild.textContent = 'Get a hint';
+      hb.style.setProperty('--h', hb.offsetHeight + 'px');
+      hb.classList.remove('grow');
+      hb.classList.add('shrink');
+      hb.addEventListener('animationend', () => { s.closing = false; s.hint = false; renderQuiz(); }, { once: true });
+      return;
+    }
+    s.hint = !s.hint; renderQuiz();
+  }
+  if (a === 'finish') navigate('forward', renderResults);
 }
 
 /* ---------------- results ---------------- */
@@ -541,9 +615,9 @@ function renderResults() {
     <button class="nav-btn" data-act="home">${I.back}<span>Home</span></button>
     <div class="nav-title"><b>Results</b><small>${esc(s.title)}</small></div><div></div>
   </div></nav>
-  <div class="wrap fade">
-    <div class="result">
-      <svg viewBox="0 0 150 150" aria-hidden="true"><circle cx="75" cy="75" r="${r}" fill="none" stroke="var(--fill2)" stroke-width="14"/>${pct > 0 ? `<circle cx="75" cy="75" r="${r}" fill="none" stroke="${gradeColor(pct)}" stroke-width="14" stroke-linecap="round" stroke-dasharray="${pct * c} ${c}" transform="rotate(-90 75 75)"/>` : ''}<text x="75" y="84" text-anchor="middle" font-family="Plus Jakarta Sans, sans-serif" font-weight="800" font-size="32" fill="var(--label)">${Math.round(pct * 100)}%</text></svg>
+  <div class="wrap">
+    <div class="result rise" style="--i:0">
+      <svg viewBox="0 0 150 150" aria-hidden="true"><circle cx="75" cy="75" r="${r}" fill="none" stroke="var(--fill2)" stroke-width="14"/>${pct > 0 ? `<circle class="arc" cx="75" cy="75" r="${r}" fill="none" stroke="${gradeColor(pct)}" stroke-width="14" stroke-linecap="round" stroke-dasharray="${pct * c} ${c}" transform="rotate(-90 75 75)"/>` : ''}<text x="75" y="84" text-anchor="middle" font-family="Plus Jakarta Sans, sans-serif" font-weight="800" font-size="32" fill="var(--label)">${Math.round(pct * 100)}%</text></svg>
       <h2>${ok} of ${ids.length} correct</h2>
       <p>${msg}</p>
       <div class="tally">
@@ -552,21 +626,21 @@ function renderResults() {
         ${skipped ? `<span style="background:var(--fill);color:var(--label2)">${skipped} skipped</span>` : ''}
       </div>
     </div>
-    <div class="stack">
+    <div class="stack rise" style="--i:3">
       ${wrong.length ? `<button class="btn primary" data-act="retry">${I.redo.replace('<svg', '<svg style="width:18px;height:18px"')}Retry the ${wrong.length} I missed</button>` : ''}
       <button class="btn secondary" data-act="again">Start this set again</button>
     </div>
-    ${wrong.length ? `<div class="sec-h"><h2>Missed</h2><span>Tap to revisit</span></div>${wrong.map(id => { const q = BYID[id], set = SETS[q.set], col = WCOL[set.w % WCOL.length]; return `<button class="miss" data-jump="${id}" style="--c:${col}"><span class="wk-num">${set.w}</span><span class="t"><b>Week ${set.w}${set.practice ? ' practice' : ''} · Q${q.n}</b><span>${esc(plain(q.q).slice(0, 140))}</span></span>${I.chev}</button>`; }).join('')}` : ''}
+    ${wrong.length ? `<div class="sec-h"><h2>Missed</h2><span>Tap to revisit</span></div>${wrong.map((id, i) => { const q = BYID[id], set = SETS[q.set], col = WCOL[set.w % WCOL.length]; return `<button class="miss rise" data-jump="${id}" style="--c:${col};--i:${4 + Math.min(i, 10)}"><span class="wk-num">${set.w}</span><span class="t"><b>Week ${set.w}${set.practice ? ' practice' : ''} · Q${q.n}</b><span>${esc(plain(q.q).slice(0, 140))}</span></span>${I.chev}</button>`; }).join('')}` : ''}
   </div>`;
   app.querySelector('[data-act=home]').onclick = () => history.back();
   const rt = app.querySelector('[data-act=retry]');
-  if (rt) rt.onclick = () => { session = { title: 'Retry', subtitle: s.title, ids: wrong, mixed: true, idx: 0, res: {}, seen: {}, sel: [], revealed: false }; renderQuiz(); window.scrollTo(0, 0); };
-  app.querySelector('[data-act=again]').onclick = () => { session = { ...s, idx: 0, res: {}, seen: {}, sel: [], revealed: false, ids: s.mixed ? shuffle(s.ids) : s.ids }; renderQuiz(); window.scrollTo(0, 0); };
-  app.querySelectorAll('[data-jump]').forEach(b => b.onclick = () => go(s.ids.indexOf(b.dataset.jump)));
+  if (rt) rt.onclick = () => { session = { title: 'Retry', subtitle: s.title, ids: wrong, mixed: true, idx: 0, res: {}, seen: {}, sel: [], revealed: false }; navigate('forward', renderQuiz); };
+  app.querySelector('[data-act=again]').onclick = () => { session = { ...s, idx: 0, res: {}, seen: {}, sel: [], revealed: false, lastId: null, ids: s.mixed ? shuffle(s.ids) : s.ids }; navigate('forward', renderQuiz); };
+  app.querySelectorAll('[data-jump]').forEach(b => b.onclick = () => navigate('forward', () => { s.lastId = null; go(s.ids.indexOf(b.dataset.jump)); }));
   window.scrollTo(0, 0);
 }
 
-window.addEventListener('popstate', () => { if (session) renderHome(); });
+window.addEventListener('popstate', () => { if (session) navigate('back', () => renderHome(false)); });
 document.addEventListener('keydown', e => {
   if (!session || e.metaKey || e.ctrlKey || e.altKey) return;
   const p = document.getElementById('primary');
