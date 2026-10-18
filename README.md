@@ -25,3 +25,9 @@ After editing, rebuild `index.html`:
 ```bash
 python build.py
 ```
+
+## App icon
+Add the site to your home screen ("Add to Home Screen" on iPhone, "Install app" on Android) to get the ML Revision icon and a full-screen app view. Icons live in `icons/` and are generated with:
+```bash
+python make_icons.py
+```
